@@ -458,17 +458,18 @@ namespace mobjReadFromFile
 
 				if (s[idx]=='"')
 				{
-					v.push_back (Tokin(tokinType::STRING, ++idx));
+					unsigned i = idx + 1;
+					v.push_back (Tokin(tokinType::STRING, i));
 					notstring = false;
 
 					continue;
 				}
-
 				if (notnum && num.find_last_of(s[idx])!=std::string::npos)
 				{
 					v.push_back(Tokin(tokinType::INT, idx));
 					notnum = false;
 					prew = v.size();
+
 					continue;
 				}
 				if (!notnum && prew != v.size())
@@ -598,7 +599,7 @@ namespace mobjReadFromFile
 			std::vector<add>& work,
 			std::vector<unsigned>& arrayIdx)
 		{
-			for (unsigned long long idx = 0; idx < v.size (); ++idx)
+			for (unsigned long long idx = 0; idx < v.size (); ++idx) {
 				switch(v[idx].type)
 				{
 					case tokinType::INT:
@@ -611,6 +612,7 @@ namespace mobjReadFromFile
 					case tokinType::OMAP:   OMAP   (d, work);                   continue;
 					case tokinType::CMAP:   CMAP   (d, work);                   continue;
 				}
+			}
 		}
 	}
 
@@ -632,6 +634,7 @@ namespace mobjReadFromFile
 
 
 
+
 	// переводит json данные в объект Mobj
 	void read (std::istream& is, Mobj& o)
 	{
@@ -649,12 +652,15 @@ namespace mobjReadFromFile
 		strToTok (idx, str, v);
 		tokToMobj (v, str, o);
 	}
+
+	void read (std::string&& str, Mobj& o)
+	{
+		std::vector<Tokin> v;
+		unsigned idx = 0;
+		strToTok (idx, str, v);
+		tokToMobj (v, str, o);
+	}
 }
-
-
-
-
-
 
 
 
@@ -667,12 +673,10 @@ void Mobj::readFromFile (const char path[])
 	fin.close ();
 }
 
-
-
-
-
-
-
+void Mobj::readFromStrData (std::string&& data)
+{
+	mobjReadFromFile::read (std::move (data), *this);
+}
 
 
 
