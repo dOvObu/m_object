@@ -60,6 +60,7 @@ public:
 	unsigned long long size () const;
 	char type () const;
 	void readFromFile (const char path[]);
+	void readFromStrData (std::string&& data);
 
 private:
 	void* p = nullptr;
